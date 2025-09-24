@@ -1,0 +1,92 @@
+DBMS(DataBase Management System/Software)
+=> Oracle / Mysql / SQL Server / Postresql / DB2 / . . .
+
+SQL(Structured Query Language) 
+=> 구조화된(규칙이 있는) 질의 언어
+
+개인 개발자용이지만 상업적이용은 돈내야함
+
+Express = 개인 개발자, 21, c = 버전, 클라우드
+
+https://www.oracle.com/kr/database/technologies/xe-downloads.html
+https://www.oracle.com/kr/database/sqldeveloper/technologies/download/
+
+sqlplus / as sysdba
+
+desc all_users;
+
+select username from all_users;
+
+conn scott/tiger;
+
+
+-- 쿼리가 모여있는 스크립트
+
+--  가변 캐릭터 varchar2
+create table student(
+  sno number,  -- column: 학생 번호를 담은 열.
+  sname varchar2(100), -- column: 학생 이름(오라클에 최적화된 가변 문자열 100개까지)를 담은 열.
+  score number -- column: 점수를 숫자를 담은 열.
+);
+
+select * from student; -- 쿼리한줄
+
+insert into student (sno, sname) VALUES (100, '블랙타이거쉬림프핒자');
+insert into student (sno, sname, score) VALUES (200, '블랙앵거스스테잌핒자', 98);
+
+UPDATE  student 
+SET     score = 99
+where   sno = 200;
+
+// 오라클 서버 중단하는 명령어
+// 셧다운 하면 db에접속이막힘 
+shutdown immediate 
+
+// cmd창 껏다켜주고 아래명령실행해서 서버열어줌
+sqlplus / as sysdba
+startup
+
+Oracle DB ---- Sql Developer 1/ toad, orange, plsql developer, dbeaver
+
+Oracle DB(서버) 라는이름의 dbms가 실행되고있으면 여기에 접속해서
+sql Developer들을 사용하여(복수 사용가능) 작업 가능.
+
+=> sql Developer 는 돌아가는 DB에 접속해서 작업(sql 실행)할때 사용하는 툴
+
+win + 서비스 
+=> win운영체제에서 실행되고 있는 demon들이 보인다.
+=> OracleServiceXE를 중지시키면 shutdown immediate 과 같은 결과
+
+각세션에서 해당 DB에 변경사항을 영구적으로 반영하겠습니다.
+commit;
+
+Oracle에서는 SQL 구문은 대문자로써라
+=>  column은 대소문자구문이 없다. 그리고 column, FROM은 쓸때 줄바꿈해라
+=> ,column  형식으로써라.
+
+
+
+create table student(
+  sno number,  -- column: 학생 번호를 담은 열.
+  sname varchar2(100), -- column: 학생 이름(오라클에 최적화된 가변 문자열(varchar2) 100개까지)를 담은 열.
+  score number -- column: 점수를 숫자를 담은 열.
+);
+
+select * from student; -- 쿼리한줄
+
+insert into student (sno, sname) VALUES (100, '블랙타이거쉬림프핒자');
+insert into student (sno, sname, score) VALUES (200, '블랙앵거스스테잌핒자', 98);
+
+UPDATE  student 
+SET     score = 99
+where   sno = 200;
+
+select * from bonus;
+select * from dept;
+select * from emp;
+select * from salgrade;
+
+
+*도구 > 환경설정 > 데이터베이스 > NLS > RR/MM/DD 가 기본값.
+=>RRRR/MM/DD
+=> RRRR/MM/DD HH24:MI:SS
