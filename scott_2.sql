@@ -207,7 +207,9 @@ SELECT NULL -- 모든 직원의 평균 급여.
 FROM EMP
 ORDER BY 1, 2; -- 1열로 우선 정렬을 하고,그 값에서 2열기준으로 세부 정렬을 갈기갰다
 
---PAGE 165.  바로위에 머리터지게어지러운 코드를 딸ㄹ깍으로 해치워주는 ROLLUP()
+--PAGE 165. 집계함수, 리포트만드는 직무에서 자주쓴다.
+-- FULL < INDEX	, COST는 낮을수록 좋다
+-- 바로위에 머리터지게어지러운 코드를 딸ㄹ깍으로 해치워주는 ROLLUP()
 SELECT --NVL2(DEPTNO, DEPTNO, '합계') 이건 되겠죠?
 DECODE(NVL(DEPTNO, 999),999,'전체', DEPTNO) AS " 부서" -- 이건 추후에 개선해볼여지가있다
 --  NVL2(TO_CHAR(DEPTNO), DEPTNO, '합계')AS " 부서"
@@ -218,4 +220,158 @@ FROM EMP
 GROUP BY ROLLUP(DEPTNO, JOB) -- 부서별, 직무별 소계 함수 사용.
 ORDER BY 1, 2;
 
+-- Page 178. CUBE() 집계함수
+SELECT deptno, job, round(avg(sal),1) avg_sal, count(*) cnt_emp
+from emp
+group by cube(deptno, job)
+order by deptno, job;
 
+
+
+-- 오후 수업
+
+SELECT dept.*, emp.*
+FROM emp 
+JOIN dept
+on emp.deptno = dept.deptno -- 이너조인, 이퀴조인?
+order by emp.deptno;
+
+select count(*) from emp;
+select count(*) from dept;
+
+-- Page 220. emp * dept => 48
+select count(*) from emp, dept;
+
+-- on을 통해 특정항목에대한 조건을 주면 => 12
+select count(*)
+from emp
+join dept
+on emp.deptno = dept.deptno;
+
+-- 학생태이블의 교수번호대신에 교수테이블의 교수이름을가져와서 보여줄수있을까
+select * from student; -- Profno 
+select * from professor; -- Profno
+
+-- 이너조인을하면 드라이빙테이블에 널값이있을때 해당항목은 날아간다.
+-- 드라이빙테이블의 모든항목에대하여 조인조건을 만족하지못하더라도 출력하려면 아우터조인을 걸어준다.
+-- Left OUTER: 근데 아우터조인은 안쓰는게 제일좋다.
+select studno -- order by s.studno p.profno
+  ,s.name  AS "학생 명"
+  ,grade
+  ,s.profno
+  ,p.name AS "교수 명"
+  ,s.deptno1
+  ,d.dname AS "학과 명"
+from student s -- from 뒤에오는 테이블을 주(드라이빙) 테이블(Left)이라고 한다.
+Left OUTER JOIN professor p -- 드리븐 테이블(Right)
+on s.profno = p.profno
+join department d
+on s.deptno1 = d.deptno;
+
+-- Right outer join
+SELECT p.profno
+  ,p.name
+  ,s.name AS "학생명" 
+  ,s.profno AS "담당 교수"
+FROM professor p
+left outer join student s
+--right outer join student s
+on p.profno = s.profno;
+
+-- Page 236. none Equi Join 
+-- 어? 그러면 조인 조건의 순서에따라서도 효율이 달라질수있겠네? 아닌가? 
+-- => 오라클 옵티마이저님님님이 한 문장(;까지)읽고 다 알아서 효율좋은방향으로 실행해주니까 걱정ㄴ
+-- Ansi join문법이 가장 중요하다 모든 sql공통으로 사용하기때문에 무조건 이걸 우선으로 해라.
+select s.grade, e.*
+from emp e
+join salgrade s
+on e.sal >= s.losal
+and e.sal <= s.hisal
+and s.grade = 2; -- 조건을 조인조건내부에주는게 연산이 줄어들어서 효율이 좋다.
+--where s.grade = 3;
+
+
+-- oracle join.
+select e.*, d.*
+from emp e, dept d
+where e.deptno = d.deptno;
+
+-- oracle outer join 
+select e1.empno AS "사원 번호"
+  ,e1.ename as "dlfma"
+  ,e2.empno AS "admin num"
+  ,e2.ename AS "admin name"
+from emp e1, emp e2
+where e1.mgr = e2.empno(+);
+
+select * from department;
+
+-- 254p Q1. Ansi join
+select s.name
+  ,s.deptno1
+  ,d.dname
+from student s
+join department d
+on s.deptno1 = d.deptno;
+
+-- 254p Q1. oracle join
+select s.name
+  ,s.deptno1
+  ,d.dname
+from student s, department d
+where s.deptno1 = d.deptno;
+
+--254p Q2. Ansi join
+select * from emp2; 
+select * from p_grade;
+select e.name
+  ,e.position
+  ,to_Char(e.pay, '999,999,999')
+  ,to_Char(p.s_pay, '999,999,999') AS "Low PAY"
+  ,to_Char(p.e_pay,'999,999,999') AS "High PAY"
+from emp2 e
+join p_grade p
+on e.position = p.position;
+
+
+--255p Q3. Ansi join
+select * from emp2; 
+select * from p_grade;
+select e.name
+  ,e.position
+  ,TRUNC(MONTHS_BETWEEN(ADD_MONTHS(sysdate, - 144), e.birthday) / 12) AS age
+--  ,case when (MONTHS_BETWEEN(ADD_MONTHS(sysdate, - 144), e.birthday) / 12) BETWEEN p.s_age and p.e_age then p.position
+--        else ''||p.s_age||'~'||p.e_age ||p.position
+    ,case when TRUNC(MONTHS_BETWEEN(ADD_MONTHS(sysdate, - 144), e.birthday) / 12) BETWEEN 0 and 24 then '매니저'
+          when TRUNC(MONTHS_BETWEEN(ADD_MONTHS(sysdate, - 144), e.birthday) / 12) BETWEEN 25 and 28 then 'Deputy Section chief'
+          when TRUNC(MONTHS_BETWEEN(ADD_MONTHS(sysdate, - 144), e.birthday) / 12) BETWEEN 29 and 32 then 'Section Head'
+          when TRUNC(MONTHS_BETWEEN(ADD_MONTHS(sysdate, - 144), e.birthday) / 12) BETWEEN 33 and 36 then 'Deputy department head'
+          when TRUNC(MONTHS_BETWEEN(ADD_MONTHS(sysdate, - 144), e.birthday) / 12) BETWEEN 37 and 40 then 'department head'
+          when TRUNC(MONTHS_BETWEEN(ADD_MONTHS(sysdate, - 144), e.birthday) / 12) BETWEEN 41 and 55 then 'Director'
+    else to_char(TRUNC(MONTHS_BETWEEN(ADD_MONTHS(sysdate, - 144), e.birthday) / 12))
+    end AS "BE_POSITION"
+from emp2 e
+left outer join p_grade p
+on e.position = p.position
+order by TRUNC(MONTHS_BETWEEN(ADD_MONTHS(sysdate, - 144), e.birthday) / 12);
+
+--255p Q4. Ansi join
+select * from customer order by point desc;
+select * from gift;
+SELECT c.gname AS "CUST_NAME"
+  ,c.point AS "POINT"
+  ,g.gname AS "GIFT_NAME"
+from customer c
+join gift g
+on g.g_end <= c.point -- g.g_start
+and g.gname = 'Notebook';
+
+
+--256p Q5. Ansi join
+--select * from professor;
+--select p1.profno
+--  ,p1.name
+--  ,to_char(p1.hiredate,'yyyy/mm/dd') AS "HIREDATE"
+--from professor p1
+--join professor p2
+--on p1.id = substr(p2.name, -1 ,instr(p2.name,' '));
