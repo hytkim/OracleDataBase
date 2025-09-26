@@ -227,7 +227,7 @@ INSERT INTO EMP2 VALUES (20000119,'Harrison Ford',TO_DATE('19801105','YYYYMMDD')
 INSERT INTO EMP2 VALUES (20000210,'Clint Eastwood',TO_DATE('19801215','YYYYMMDD'),'1005','Intern','031)345-3456','Reading book', 20000000,'',19960303);
 COMMIT;
 
-drop table dept2 cascade constraint;
+drop table dept2 cascade constraint purge;
 
 CREATE TABLE DEPT2 (
  DCODE   VARCHAR2(06)  PRIMARY KEY,
