@@ -142,3 +142,160 @@ where p.pay < (select max(pay) from professor
 where bonus is null);
 
 rollback;
+
+select * from emp;
+SELECT * from dept;
+
+select * from emp e
+join dept d
+on e.deptno = d.deptno;
+select * from emp;
+select * from dept;
+create or replace view emp_dept_v
+as
+select empno
+  ,ename
+  ,job
+  ,sal 
+  ,e.deptno
+  ,dname
+from emp e
+join dept d
+on e.deptno = d.deptno;
+
+select * from emp_dept_v;
+
+drop view emp_dept_v;
+
+create or replace view emp_v
+as
+select empno, ename, job, deptno
+from emp;
+
+select * from emp_v;
+
+select * from tab;
+
+-- 학생과 담당교수 뷰.
+-- 학생번호, 이름, id, 학년, 주민, 생일, 번호, 키,무게 전공1,전공2, 교수번호
+select * from student; 
+-- 교수번호, 이름, id, 포지션, 급여, 입사일, 보너스, 과목번호, 이메일, 홈페이지
+select * from professor;
+
+create or replace view stud_prof_v
+as 
+(select studno
+  ,s.name studname
+  ,s.birthday
+  ,s.tel
+  ,s.deptno1
+  ,p.profno profno
+  ,p.name profname
+  ,p.position
+  ,p.email
+from student s
+left outer join professor p
+on s.profno = p.profno);
+
+select * from stud_prof_v;
+
+select v.*, d.dname
+from stud_prof_v v
+join department d
+on v.deptno1 = d.deptno
+where position = 'a full professor';
+
+select position, count(*)
+from stud_prof_v v
+join department d
+on v.deptno1 = d.deptno
+group by position;
+
+-- update view
+create or replace view emp_v2
+as select  empno, ename, job
+from emp;
+
+-- 없는거 호출하니까 오류남
+update emp_v2
+set ename = ''
+  ,deptno = ''
+where empno = '9999';
+
+-- Create
+
+drop table board_t purge;
+CREATE TABLE board_t(
+  board_no NUMBER(5) CONSTRAINT PK_board PRIMARY KEY
+  ,	title VARCHAR2(100)    NOT NULL
+  ,	content VARCHAR2(1000) NOT NULL
+  ,	writer NVARCHAR2(50)   NOT NULL
+  ,	write_date DATE DEFAULT SYSDATE  
+  ,	likes	NUMBER(3) DEFAULT 0  
+);
+
+--INSERT INTO table VALUES ()
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES (1, '예담맛집부록', '탄탄면이 상당해..', 'Hong');
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES (2, '마리포사 폐점', '건물보수를 위한 공사,,,,', '맛집 사랑꾼');
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES (3, '취직실패', '개같이 실패!!!!', '나너무힘들어');
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES (4, 'Insert 쿼리', 'INSERT INTO table VALUES ()', 'dba');
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES ( nvl((select max(board_no)+1 from board_t), 1), 'Insert 쿼리(wls)', 'INSERT INTO table(c1, c2, c3) VALUES (1, c2, c3)', 'dba');
+-- 시퀀스를쓰면값이 자동으로 올라가기때문에 주의!
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES ( board_t_seq.nextval , 'Insert 쿼리(wls)', 'INSERT INTO table(c1, c2, c3) VALUES (1, c2, c3)', 'dba');
+
+select * from board_t;
+
+-- Oracle Sequence 오라클 시퀀스
+drop sequence board_t_seq;
+create sequence board_t_seq
+increment by 2 -- 2씩증가함
+start WITH 100-- 100부터 시작함
+maxvalue 120 --최대값 120으로지정함
+MINVALUE 80 -- 이 시퀀스가 가질수있는 최소값
+cycle -- 120까지가면 minvalue부터 다시 시작함
+;
+select board_t_seq.nextval from dual;
+
+
+-- 시퀀스를 반영해서 생성문을 최적화해보자
+drop table board_t purge;
+CREATE TABLE board_t(
+  board_no NUMBER(5) CONSTRAINT PK_board PRIMARY KEY
+  ,	title VARCHAR2(100)    NOT NULL
+  ,	content VARCHAR2(1000) NOT NULL
+  ,	writer NVARCHAR2(50)   NOT NULL
+  ,	write_date DATE DEFAULT SYSDATE  
+  ,	likes	NUMBER(3) DEFAULT 0  
+);
+
+drop sequence board_t_seq;
+create sequence board_t_seq;
+
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES (board_t_seq.nextval, '예담맛집부록', '탄탄면이 상당해..', 'Hong');
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES (board_t_seq.nextval, '마리포사 폐점', '건물보수를 위한 공사,,,,', '맛집 사랑꾼');
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES (board_t_seq.nextval, '취직실패', '개같이 실패!!!!', '나너무힘들어');
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES (board_t_seq.nextval, 'Insert 쿼리', 'INSERT INTO table VALUES ()', 'dba');
+INSERT INTO board_t(board_no, title, content, writer) 
+  VALUES ( board_t_seq.nextval, 'Insert 쿼리(wls)', 'INSERT INTO table(c1, c2, c3) VALUES (1, c2, c3)', 'dba');
+  
+select * from board_t;
+
+-- 테이블의 데이터를가져와서 그대로 새 데이터처럼집어넣어서 양 복사하는 기술
+insert into board_t (board_no, title, content, writer)
+select board_t_seq.nextval, title, content, writer
+from board_t;
+
+select count(*) from board_t;
+
+-- 처음 지정한 테이블크기때문에 값이 더 안들어가서 수정이필요해졌다
+alter table board_t modify board_no number(10);
