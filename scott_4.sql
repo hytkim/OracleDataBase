@@ -17,6 +17,9 @@ update emp set sal = sal * 1.1
 where hiredate < to_date('1981-07-01','yyyy-mm-dd')
 and hiredate >= to_date('1981-01-01','yyyy-mm-dd'); 
 
+--update emp e
+--set sal = sal *1.1
+--  where exists();
 
 -- Rene Russo 학생을 담당하고있는 교수(profno)의 name, position
 select * from professor;
@@ -299,3 +302,6 @@ select count(*) from board_t;
 
 -- 처음 지정한 테이블크기때문에 값이 더 안들어가서 수정이필요해졌다
 alter table board_t modify board_no number(10);
+
+
+
