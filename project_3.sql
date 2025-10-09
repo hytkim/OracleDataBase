@@ -72,31 +72,44 @@ VALUES (comments_seq.NEXTVAL, 5, 'user3', '저도 이 책상 사용 중인데 �
 ------------------------------------------------
 -- 6. 구매내역 (project_history_t)
 ------------------------------------------------
-INSERT INTO project_history_t (history_no, items_no, user_id, history_item_name, history_count, history_item_totalpay, history_note)
-VALUES (history_seq.NEXTVAL, 1, 'user1', '스마트TV', '1', '1500000', '출고');
-INSERT INTO project_history_t (history_no, items_no, user_id, history_item_name, history_count, history_item_totalpay, history_note)
-VALUES (history_seq.NEXTVAL, 2, 'user2', '프리미엄 코트', '1', '250000', '출고');
-INSERT INTO project_history_t (history_no, items_no, user_id, history_item_name, history_count, history_item_totalpay, history_note)
-VALUES (history_seq.NEXTVAL, 3, 'admin', '유기농 쌀', '2', '100000', '출고');
-INSERT INTO project_history_t (history_no, items_no, user_id, history_item_name, history_count, history_item_totalpay, history_note)
-VALUES (history_seq.NEXTVAL, 4, 'user1', 'Oracle SQL 완벽 가이드', '1', '30000', '출고');
-INSERT INTO project_history_t (history_no, items_no, user_id, history_item_name, history_count, history_item_totalpay, history_note)
-VALUES (history_seq.NEXTVAL, 5, 'user2', '원목 책상', '1', '120000', '출고');
+INSERT INTO project_history_t (history_no, items_no, user_id, history_item_name, history_count, history_item_totalpay, history_note, history_address)
+VALUES (history_seq.NEXTVAL, 1, 'user1', '스마트TV', '1', '1500000', '출고', '서울시 강남구 테헤란로 123');
+INSERT INTO project_history_t (history_no, items_no, user_id, history_item_name, history_count, history_item_totalpay, history_note, history_address)
+VALUES (history_seq.NEXTVAL, 2, 'user2', '프리미엄 코트', '1', '250000', '출고', '부산시 해운대구 센텀중앙로 456');
+INSERT INTO project_history_t (history_no, items_no, user_id, history_item_name, history_count, history_item_totalpay, history_note, history_address)
+VALUES (history_seq.NEXTVAL, 3, 'admin', '유기농 쌀', '2', '100000', '입고', '물류센터 A동');
+INSERT INTO project_history_t (history_no, items_no, user_id, history_item_name, history_count, history_item_totalpay, history_note, history_address)
+VALUES (history_seq.NEXTVAL, 4, 'user1', 'Oracle SQL 완벽 가이드', '1', '30000', '출고', '서울시 강남구 테헤란로 123');
+INSERT INTO project_history_t (history_no, items_no, user_id, history_item_name, history_count, history_item_totalpay, history_note, history_address)
+VALUES (history_seq.NEXTVAL, 5, 'user2', '원목 책상', '1', '120000', '출고', '부산시 해운대구 센텀중앙로 456');
 
 
 update project_history_t h
 set h.history_item_image = 'logo.png';
 
+update project_items_t i
+set i.items_image = 'logo.png';
+
 select * from project_history_t;
+select * from project_user_t;
+select * from project_items_t;
+select * from project_board_t;
+select * from project_comments_t;
 
 
-
-select d.discount_percent, i.items_price, i.items_name, h.history_item_image
+select d.discount_percent
+    , i.items_price
+    , i.items_name
+    , i.items_category
+    , h.history_item_image
                   FROM project_items_t i
                   JOIN project_discount_t d
                       ON i.items_category = d.items_category
                   JOIN project_history_t h
                       ON i.items_no = h.items_no
                   WHERE h.history_note != '입고';
-                  
+
+INSERT INTO project_user_t (user_id, user_pw, user_name,user_address, user_birth)
+VALUES ('user5', 'user5', '랆쥐','람각' ,TO_DATE('1999-09-09', 'YYYY-MM-DD'));
+       
 commit;

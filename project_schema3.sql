@@ -99,6 +99,7 @@ CREATE TABLE project_history_t (
     ,  history_item_totalpay VARCHAR2(50)NOT NULL -- 거래된 상품 가격 기록
     ,  history_item_image VARCHAR2(1000) NULL     -- 거래된 상품 이미지 정보(없을수도있음)
     ,  history_note       VARCHAR2(50)   NOT NULL -- 입고/출고 여부(admin = 입고, user = 출고)
+    ,  history_address    VARCHAR2(255)  NOT NULL -- 배송지 주소
     ,  CONSTRAINT pk_history_no PRIMARY KEY (history_no)
     ,  CONSTRAINT fk_history_items FOREIGN KEY (items_no) REFERENCES project_items_t (items_no)
     ,  CONSTRAINT fk_history_user FOREIGN KEY (user_id) REFERENCES project_user_t (user_id)
